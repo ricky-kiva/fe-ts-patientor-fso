@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { assertNever, Diagnosis, Entry, Gender, Patient } from "../../types";
+import { assertNever, Diagnosis, Entry, Gender, HealthCheckRating, Patient } from "../../types";
 import { Favorite, Female, LocalHospital, Male, MedicalServices, Transgender, Work } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import patients from "../../services/patients";
@@ -10,6 +10,21 @@ const PatientInformationPage = () => {
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [diagnosisList, setDiagnosisList] = useState<Diagnosis[] | null>(null);
+
+  const getHealthRatingColor = (rating: HealthCheckRating) => {
+    switch (rating) {
+      case HealthCheckRating.Healthy:
+        return "green";
+      case HealthCheckRating.LowRisk:
+        return "yellow";
+      case HealthCheckRating.HighRisk:
+        return "orange";
+      case HealthCheckRating.CriticalRisk:
+        return "red";
+      default:
+        assertNever(rating);
+    }
+  };
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -48,7 +63,7 @@ const PatientInformationPage = () => {
         return <>
           <span style={{ lineHeight: "1.25"}}>{entry.date} <MedicalServices fontSize="small" />
             <br/><i>{entry.description}</i>
-            <br/><Favorite sx={{ color: "green" }} />
+            <br/><Favorite sx={{ color: getHealthRatingColor(entry.healthCheckRating) }} />
             <br/>diagnose by {entry.specialist}
           </span>
         </>;
