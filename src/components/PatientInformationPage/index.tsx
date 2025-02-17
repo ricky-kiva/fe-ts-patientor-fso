@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import { assertNever, Diagnosis, Gender, Patient } from "../../types";
-import { Female, Male, Transgender } from "@mui/icons-material";
+import { assertNever, Diagnosis, Entry, Gender, Patient } from "../../types";
+import { Favorite, Female, LocalHospital, Male, MedicalServices, Transgender, Work } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import patients from "../../services/patients";
 import diagnoses from "../../services/diagnoses";
@@ -42,6 +42,35 @@ const PatientInformationPage = () => {
     }
   };
 
+  const renderEntry = (entry: Entry) => {
+    switch(entry.type) {
+      case 'HealthCheck':
+        return <>
+          <span style={{ lineHeight: "1.25"}}>{entry.date} <MedicalServices fontSize="small" />
+            <br/><i>{entry.description}</i>
+            <br/><Favorite sx={{ color: "green" }} />
+            <br/>diagnose by {entry.specialist}
+          </span>
+        </>;
+      case 'OccupationalHealthcare':
+        return <>
+          <span style={{ lineHeight: "1.25"}}>{entry.date} <Work fontSize="small" /> {entry.employerName}
+            <br/><i>{entry.description}</i>
+            <br/>diagnose by {entry.specialist}
+          </span>
+        </>;
+      case 'Hospital':
+        return <>
+          <span style={{ lineHeight: "1.25"}}>{entry.date} {entry.description} <LocalHospital fontSize="small"/>
+            <br/>diagnose by {entry.specialist}
+            <br/>discharged {entry.discharge.date}: {entry.discharge.criteria}
+          </span>
+        </>;
+      default:
+        assertNever(entry);
+    }
+  };
+
   return (
     <div style={{ margin: "16px 0" }}>
       <div>
@@ -54,15 +83,23 @@ const PatientInformationPage = () => {
       </div>
       <div>
         <h3>entries</h3>
-        {patient.entries.map(p => 
-          <div key={p.id}>
-            <p>{p.date} <i>{p.description}</i></p>
-            <ul>
-              {p.diagnosisCodes?.map(d => {
-                const diagnosis = diagnosisList?.find(dn => dn.code === d);
-                return <li key={d}>{d} {diagnosis?.name}</li>;
-              })}
-            </ul>
+        {patient.entries.map(entry => 
+          <div key={entry.id} style={{
+            border: "1px solid",
+            borderRadius: "8px",
+            padding: "4px",
+            marginBottom: "8px"
+          }}>
+            {renderEntry(entry)}
+            {entry.diagnosisCodes
+              ? <ul>
+                {entry.diagnosisCodes?.map(d => {
+                  const diagnosis = diagnosisList?.find(dn => dn.code === d);
+                  return <li key={d}>{d} {diagnosis?.name}</li>;
+                })}
+              </ul>
+              : <></>
+            }
           </div>
         )}
       </div>
