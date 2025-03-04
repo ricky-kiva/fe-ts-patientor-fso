@@ -1,8 +1,5 @@
-export interface Diagnosis {
-  code: string;
-  name: string;
-  latin?: string;
-}
+import { z } from "zod";
+import { BaseEntrySchema, DiagnosisSchema, EntrySchema, HealthCheckFieldsSchema, HospitalFieldsSchema, NewEntrySchema, OccupationalHealthcareFieldsSchema } from "./utils";
 
 export enum Gender {
   Male = "male",
@@ -10,48 +7,15 @@ export enum Gender {
   Other = "other"
 }
 
-export enum HealthCheckRating {
-  "Healthy" = 0,
-  "LowRisk" = 1,
-  "HighRisk" = 2,
-  "CriticalRisk" = 3
-}
+export type Diagnosis = z.infer<typeof DiagnosisSchema>;
+export type BaseEntry = z.infer<typeof BaseEntrySchema>;
+export type HealthCheckFields = z.infer<typeof HealthCheckFieldsSchema>;
+export type OccupationalHealthcareFields = z.infer<typeof OccupationalHealthcareFieldsSchema>;
+export type HospitalFields = z.infer<typeof HospitalFieldsSchema>;
+export type Entry = z.infer<typeof EntrySchema>;
+export type NewEntry = z.infer<typeof NewEntrySchema>;
 
-interface HospitalDischarge {
-  date: string,
-  criteria: string
-}
-
-interface OccupationalHealthcareSickLeave {
-  startDate: string,
-  endDate: string
-}
-
-interface BaseEntry {
-  id: string,
-  description: string,
-  date: string,
-  specialist: string,
-  diagnosisCodes?: Array<Diagnosis['code']>
-}
-
-interface HospitalEntry extends BaseEntry {
-  discharge: HospitalDischarge,
-  type: "Hospital"
-}
-
-interface OccupationalHealthcareEntry extends BaseEntry {
-  employerName: string,
-  sickLeave?: OccupationalHealthcareSickLeave,
-  type: "OccupationalHealthcare"
-}
-
-interface HealthCheckEntry extends BaseEntry {
-  healthCheckRating: HealthCheckRating,
-  type: "HealthCheck"
-}
-
-export type Entry = HospitalEntry | OccupationalHealthcareEntry | HealthCheckEntry;
+export type PatientFormValues = Omit<Patient, "id" | "entries">;
 
 export interface Patient {
   id: string;
@@ -63,7 +27,13 @@ export interface Patient {
   entries: Entry[]
 }
 
-export type PatientFormValues = Omit<Patient, "id" | "entries">;
+export const isEntry = (data: unknown): data is Entry => {
+  return EntrySchema.safeParse(data).success;
+};
+
+export const isString = (data: unknown): data is string => {
+  return typeof data === "string" || data instanceof String;
+};
 
 export const assertNever = (value: never): never => {
   throw new Error(`Unhandled discriminated union member: ${JSON.stringify(value)}`);
