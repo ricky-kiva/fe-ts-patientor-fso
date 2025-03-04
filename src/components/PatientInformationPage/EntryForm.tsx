@@ -166,14 +166,19 @@ const EntryForm = (props: Props) => {
               id="sickLeaveStartDate"
               type="date"
               name="sickLeaveStartDate"
-              value={occupationalHcData.sickLeave?.startDate}
-              onChange={({ target }) => setOccupationalHcData({
-                ...occupationalHcData,
-                sickLeave: {
-                  ...occupationalHcData.sickLeave ?? { startDate: '', endDate: '' },
-                  startDate: target.value
-                }
-              })}
+              value={occupationalHcData.sickLeave?.startDate || ""}
+              onChange={({ target }) => {
+                const currentSickLeave = occupationalHcData.sickLeave
+                  || { startDate: '', endDate: '' };
+                
+                setOccupationalHcData({
+                  ...occupationalHcData,
+                  sickLeave: {
+                    ...currentSickLeave,
+                    startDate: target.value
+                  }
+                });
+              }}
             />
             <br/>
             <label htmlFor="sickLeaveEndDate">Sick Leave End</label>
@@ -182,13 +187,18 @@ const EntryForm = (props: Props) => {
               type="date"
               name="sickLeaveEndDate"
               value={occupationalHcData.sickLeave?.endDate}
-              onChange={({ target }) => setOccupationalHcData({
-                ...occupationalHcData,
-                sickLeave: {
-                  ...occupationalHcData.sickLeave ?? { startDate: '', endDate: '' },
-                  endDate: target.value
-                }
-              })}
+              onChange={({ target }) => {
+                const currentSickLeave = occupationalHcData.sickLeave
+                  || { startDate: '', endDate: '' };
+
+                setOccupationalHcData({
+                  ...occupationalHcData,
+                  sickLeave: {
+                    ...currentSickLeave,
+                    endDate: target.value
+                  }
+                });
+              }}
             />
           </>
         );
@@ -291,9 +301,10 @@ const EntryForm = (props: Props) => {
             ...baseEntryData,
             diagnosisCodes: Array.isArray(target.value) ? target.value : []
           })}
+          size="small"
           sx={{
             width: '156.5px',
-            height: '22px'
+            height: '38px'
           }}
         >
           {props.diagnosisCodes.map((code) => (
