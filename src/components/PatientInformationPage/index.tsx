@@ -1,16 +1,18 @@
 import { useParams } from "react-router-dom";
-import { assertNever, Diagnosis, Gender, Patient } from "../../types";
-import { Female, Male, Transgender } from "@mui/icons-material";
+import { assertNever, Diagnosis, Entry, Gender, Patient } from "../../types";
+import { Female, InfoOutlined, Male, Transgender } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import patients from "../../services/patients";
 import diagnoses from "../../services/diagnoses";
 import EntriesSection from "./EntriesSection";
+import EntryForm from "./EntryForm";
 
 const PatientInformationPage = () => {
   const { id } = useParams<{ id: string }>();
 
   const [patient, setPatient] = useState<Patient | null>(null);
   const [diagnosisList, setDiagnosisList] = useState<Diagnosis[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -30,6 +32,13 @@ const PatientInformationPage = () => {
 
   if (!patient) return <p>Loading...</p>;
 
+  const addEntry = (entry: Entry) => {
+    setPatient({
+      ...patient,
+      entries: patient.entries.concat(entry)
+    });
+  };
+
   const renderGenderIcon = () => {
     switch(patient.gender) {
       case Gender.Male:
@@ -46,12 +55,27 @@ const PatientInformationPage = () => {
   return (
     <div style={{ margin: "16px 0" }}>
       <div>
-        <div>
+        <div style={{ marginBottom: "16px" }}>
           <h2 style={{ display: "inline" }}>{patient.name}</h2> {renderGenderIcon()}
         </div>
-        <p>ssn: {patient.ssn}
-          <br/>occupation: {patient.occupation}
-        </p>
+        <div style={{ marginBottom: "8px" }}>
+          <span style={{ display: "inline-block", marginBottom: "2px" }}>
+            ssn: {patient.ssn}<br/>occupation: {patient.occupation}
+          </span>
+          {errorMessage !== ''
+            ? <div style={{ backgroundColor: "mistyrose", padding: "8px" }}>
+              <span style={{ color: "maroon" }}>
+                <InfoOutlined fontSize="small" style={{ verticalAlign: "middle" }} /> {errorMessage}
+              </span>
+            </div>
+            : <></>
+          }
+        </div>
+        <EntryForm
+          patientId={patient.id}
+          addEntry={addEntry}
+          setFormError={setErrorMessage}
+        />
         <EntriesSection entries={patient.entries} diagnoses={diagnosisList}/>
       </div>
       
