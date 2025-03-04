@@ -73,6 +73,7 @@ const PatientInformationPage = () => {
         </div>
         <EntryForm
           patientId={patient.id}
+          diagnosisCodes={diagnosisList.map((d) => d.code)}
           addEntry={addEntry}
           setFormError={setErrorMessage}
         />

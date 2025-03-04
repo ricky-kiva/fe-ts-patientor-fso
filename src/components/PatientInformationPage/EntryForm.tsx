@@ -3,6 +3,7 @@ import { assertNever, BaseEntry, Entry, HealthCheckFields, HospitalFields, isEnt
 import { z } from "zod";
 import { EntrySchema } from "../../utils";
 import patients from "../../services/patients";
+import { MenuItem, Select } from "@mui/material";
 
 const defaultBaseEntryObject: Omit<BaseEntry, 'id'> = {
   description: "",
@@ -34,6 +35,7 @@ type EntryType = z.infer<typeof EntrySchema>['type'];
 
 interface Props {
   patientId: string,
+  diagnosisCodes: string[],
   addEntry: (entry: Entry) => void,
   setFormError: (message: string) => void
 }
@@ -281,18 +283,23 @@ const EntryForm = (props: Props) => {
         />
         <br/>
         <label htmlFor="diagnosisCodes">Diagnosis Codes</label>
-        <input
+        <Select
           id="diagnosisCodes"
-          type="text"
-          name="diagnosisCodes"
+          multiple
+          value={baseEntryData.diagnosisCodes || []}
           onChange={({ target }) => setBaseEntryData({
             ...baseEntryData,
-            diagnosisCodes: target.value
-              .split(',')
-              .map(item => item.trim())
-              .filter(item => item.length > 0)
+            diagnosisCodes: Array.isArray(target.value) ? target.value : []
           })}
-        />
+          sx={{
+            width: '156.5px',
+            height: '22px'
+          }}
+        >
+          {props.diagnosisCodes.map((code) => (
+            <MenuItem key={code} value={code}>{code}</MenuItem>
+          ))}
+        </Select>
         <br/>
         {renderExtraFieldsByType()}
         <div style={{ marginTop: "16px"}}>
