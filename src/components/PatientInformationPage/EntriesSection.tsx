@@ -1,5 +1,5 @@
 import { Favorite, LocalHospital, MedicalServices, Work } from "@mui/icons-material";
-import { assertNever, Diagnosis, Entry, HealthCheckRating } from "../../types";
+import { assertNever, Diagnosis, Entry } from "../../types";
 
 interface Props {
   entries: Entry[],
@@ -7,18 +7,18 @@ interface Props {
 }
 
 const EntriesSection = (props: Props) => {
-  const getHealthRatingColor = (rating: HealthCheckRating) => {
+  const getHealthRatingColor = (rating: number): string => {
     switch (rating) {
-      case HealthCheckRating.Healthy:
+      case 0:
         return "green";
-      case HealthCheckRating.LowRisk:
+      case 1:
         return "yellow";
-      case HealthCheckRating.HighRisk:
+      case 2:
         return "orange";
-      case HealthCheckRating.CriticalRisk:
+      case 3:
         return "red";
       default:
-        assertNever(rating);
+        return "inherit";
     }
   };
 
